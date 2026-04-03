@@ -18,6 +18,7 @@ class DonationController {
       pickupDate,
       pickupTime,
       specialInstructions,
+      contactNumber,
       hasAllergens,
       allergens,
       latitude,
@@ -42,13 +43,13 @@ class DonationController {
       `INSERT INTO donations (
         id, donorId, foodType, category, quantity, servings, description, isVeg, 
         imageUrl, pickupAddress, pickupDate, pickupTime, specialInstructions, 
-        hasAllergens, allergens, latitude, longitude, status, createdAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        contactNumber, hasAllergens, allergens, latitude, longitude, status, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id, donorId, foodType, category || 'others', quantity, servings, description, 
         isVeg === 'true' || isVeg === true ? 1 : 0,
         imageUrl,
-        pickupAddress, pickupDate, pickupTime, specialInstructions,
+        pickupAddress, pickupDate, pickupTime, specialInstructions, contactNumber,
         hasAllergens === 'true' || hasAllergens === true ? 1 : 0, 
         Array.isArray(allergens) ? JSON.stringify(allergens) : (allergens || '[]'), 
         parseFloat(latitude), parseFloat(longitude),

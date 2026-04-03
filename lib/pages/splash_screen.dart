@@ -16,6 +16,10 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () async {
       final apiService = ApiService();
+      
+      // Ping server (esp. for Render free tier wakeup)
+      apiService.testConnection().ignore();
+      
       final user = await apiService.getStoredUser();
 
       if (mounted) {

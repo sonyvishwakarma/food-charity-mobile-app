@@ -141,12 +141,15 @@ class AuthController {
         );
       }
 
+      console.log(`🔍 Checking user ${email ? 'email: ' + email : 'phone: ' + phone}`);
       if (!user) {
+        console.log(`❌ USER NOT FOUND: ${email || phone}`);
         return res.status(401).json({
           success: false,
           message: 'User does not exist, please register'
         });
       }
+      console.log(`✅ User found: ${user.name} (${user.id})`);
 
       let isMatch = false;
 

@@ -45,16 +45,34 @@ class _ChatInboxPageState extends State<ChatInboxPage> {
     try {
       final chats = await _apiService.apiGetUserChats(widget.user.id);
       if (mounted) {
-        setState(() {
-          _chats = chats;
-          _isLoading = false;
-        });
+        if (chats.isNotEmpty) {
+          setState(() {
+            _chats = chats;
+            _isLoading = false;
+          });
 
-        // Save to local DB (Skip on Web)
-        if (!kIsWeb) {
-          for (var chat in chats) {
-            await _dbService.saveLocalChat(chat);
+          // Save to local DB (Skip on Web)
+          if (!kIsWeb) {
+            for (var chat in chats) {
+              final normalizedChat = {
+                'id': (chat['id'] ?? chat['chatid']).toString(),
+                'user1Id': (chat['user1Id'] ?? chat['user1id']).toString(),
+                'user2Id': (chat['user2Id'] ?? chat['user2id']).toString(),
+                'user1Name': (chat['user1Name'] ?? chat['user1name'] ?? 'Unknown').toString(),
+                'user2Name': (chat['user2Name'] ?? chat['user2name'] ?? 'Unknown').toString(),
+                'lastMessage': (chat['lastMessage'] ?? chat['lastmessage'] ?? '').toString(),
+                'lastMessageTime': chat['lastMessageTime'] ?? chat['lastmessagetime'] ?? 0,
+                'createdAt': chat['createdAt'] ?? chat['createdat'] ?? '',
+              };
+              await _dbService.saveLocalChat(normalizedChat);
+            }
           }
+        } else if (_chats.isEmpty) {
+          // Both are empty
+          setState(() => _isLoading = false);
+        } else {
+          // API empty but local has data, keep local to avoid flickering/loss
+          setState(() => _isLoading = false);
         }
       }
     } catch (e) {
@@ -65,10 +83,11 @@ class _ChatInboxPageState extends State<ChatInboxPage> {
   }
 
   String _getOtherUserName(Map<String, dynamic> chat) {
-    if (chat['user1Id'] == widget.user.id) {
-      return chat['user2Name'] ?? 'Unknown';
+    final user1Id = (chat['user1Id'] ?? chat['user1id']).toString();
+    if (user1Id == widget.user.id) {
+      return (chat['user2Name'] ?? chat['user2name'] ?? 'Unknown').toString();
     }
-    return chat['user1Name'] ?? 'Unknown';
+    return (chat['user1Name'] ?? chat['user1name'] ?? 'Unknown').toString();
   }
 
   String _formatTime(dynamic timestamp) {
@@ -93,35 +112,10 @@ class _ChatInboxPageState extends State<ChatInboxPage> {
   Widget build(BuildContext context) {
     final primaryColor = RoleColors.getPrimaryColor(widget.user.role);
 
-    if (widget.user.role == UserRole.recipient ||
-        widget.user.role == UserRole.admin) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Messages'),
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.lock_person, size: 64, color: Colors.grey.shade400),
-              const SizedBox(height: 20),
-              const Text(
-                'Unauthorized Access',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Chat is only available for Donors and Volunteers.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+    // Enable chat for all roles
+    /* 
+    Formerly Restricted for Recipients/Admins
+    */
 
     return Scaffold(
       appBar: AppBar(
@@ -143,9 +137,9 @@ class _ChatInboxPageState extends State<ChatInboxPage> {
                       itemBuilder: (context, index) {
                         final chat = _chats[index];
                         final otherName = _getOtherUserName(chat);
-                        final lastMsg =
-                            chat['lastMessage'] as String? ?? 'No messages yet';
-                        final lastTime = _formatTime(chat['lastMessageTime']);
+                        final lastMsg = (chat['lastMessage'] ?? chat['lastmessage']) as String? ??
+                            'No messages yet';
+                        final lastTime = _formatTime(chat['lastMessageTime'] ?? chat['lastmessagetime']);
 
                         return ListTile(
                           contentPadding: const EdgeInsets.symmetric(

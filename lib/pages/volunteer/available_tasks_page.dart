@@ -165,12 +165,16 @@ class _AvailableTasksPageState extends State<AvailableTasksPage> with SingleTick
               itemCount: _availableDonations.length,
               itemBuilder: (context, index) {
                 final item = _availableDonations[index];
+                // Handle both foodType (SQLite/Camel) and foodtype (PostgreSQL/Lower)
+                final foodName = item['foodType'] ?? item['foodtype'] ?? 'Food Donation';
+                final address = item['pickupAddress'] ?? item['pickupaddress'] ?? 'No Address';
+                
                 return _buildTaskCard(
-                  title: item['foodType'] ?? 'Donation',
-                  subtitle: item['pickupAddress'] ?? 'No Address',
+                  title: foodName,
+                  subtitle: address,
                   servings: item['servings'] ?? 0,
-                  time: item['pickupTime'] ?? 'ASAP',
-                  isVeg: item['isVeg'] == true || item['isVeg'] == 1,
+                  time: item['pickupTime'] ?? item['pickuptime'] ?? 'ASAP',
+                  isVeg: item['isVeg'] == true || item['isVeg'] == 1 || item['isveg'] == true || item['isveg'] == 1,
                   onAccept: () => _acceptDonation(item),
                   primaryColor: primaryColor,
                   isRequest: false,
@@ -192,13 +196,17 @@ class _AvailableTasksPageState extends State<AvailableTasksPage> with SingleTick
               itemCount: _availableRequests.length,
               itemBuilder: (context, index) {
                 final item = _availableRequests[index];
+                // Handle both foodType (SQLite/Camel) and foodtype (PostgreSQL/Lower)
+                final foodName = item['foodType'] ?? item['foodtype'] ?? 'Food Request';
+                final address = item['address'] ?? 'No Address';
+
                 return _buildTaskCard(
-                  title: item['foodType'] ?? 'Request',
-                  subtitle: item['address'] ?? 'No Address',
-                  servings: item['servingsRequired'] ?? 0,
+                  title: foodName,
+                  subtitle: address,
+                  servings: item['servingsRequired'] ?? item['servingsrequired'] ?? 0,
                   time:
-                      'Needed By: ${item['createdAt']?.toString().split('T')[0] ?? 'ASAP'}',
-                  isVeg: item['isVeg'] == true || item['isVeg'] == 1,
+                      'Needed By: ${(item['createdAt'] ?? item['createdat'])?.toString().split('T')[0] ?? 'ASAP'}',
+                  isVeg: item['isVeg'] == true || item['isVeg'] == 1 || item['isveg'] == true || item['isveg'] == 1,
                   onAccept: () => _acceptRequest(item),
                   primaryColor: primaryColor,
                   isRequest: true,

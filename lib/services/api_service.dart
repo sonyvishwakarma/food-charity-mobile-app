@@ -13,16 +13,17 @@ import '../models/user_model.dart';
 class ApiService {
   // Common fallback - use PC's WiFi IP when running on physical phone
   // static const String _defaultUrl = 'http://localhost:3000/api'; // only for emulator/web
-  static const String _defaultUrl = 'http://192.168.0.106:3000/api'; // current PC WiFi IP
+  static const String _defaultUrl = 'http://10.243.96.189:4000/api'; // current PC WiFi IP
 
   // Use API_URL from .env or fallback, with smart detection
   static String get baseUrl {
     try {
-      String url = dotenv.env['API_URL'] ?? _defaultUrl;
+      // Priority 1: .env URL (ensure it's not local if using physical phone)
+      String? envUrl = dotenv.env['API_URL'];
+      String url = (envUrl != null && envUrl.isNotEmpty) ? envUrl : _defaultUrl;
       
-      // Smart detection for Android Emulator vs Web/Others
+      // Smart detection for Android Emulator
       if (!kIsWeb && Platform.isAndroid) {
-        // If the URL contains localhost, swap it with 10.0.2.2 for the Android emulator
         if (url.contains('localhost')) {
           return url.replaceAll('localhost', '10.0.2.2');
         }
@@ -30,12 +31,17 @@ class ApiService {
           return url.replaceAll('127.0.0.1', '10.0.2.2');
         }
       }
-      // NOTE: For physical devices, use the PC's actual WiFi IP (e.g. 192.168.0.106)
       
       return url;
     } catch (e) {
       return _defaultUrl;
     }
+  }
+
+  // Helper to check if we are in local development mode
+  static bool get isLocalMode {
+    final url = baseUrl.toLowerCase();
+    return url.contains('localhost') || url.contains('127.0.0.1') || url.contains('192.168.');
   }
 
   static final ApiService _instance = ApiService._internal();
@@ -50,7 +56,8 @@ class ApiService {
   final http.Client _client = http.Client();
 
   // Default timeout duration
-  static const Duration _timeout = Duration(seconds: 10);
+  // Default timeout duration - Extended for Render Free Tier wakeup
+  static const Duration _timeout = Duration(seconds: 60);
 
   // ========== TEST CONNECTION METHOD ==========
   Future<Map<String, dynamic>> testConnection() async {
@@ -149,7 +156,7 @@ class ApiService {
   // ========== ERROR HANDLING ==========
   String _handleError(dynamic error) {
     if (error is SocketException) {
-      return 'Cannot reach server at $baseUrl\n(Check WiFi & firewall on PC)';
+      return 'Network Error: Cannot reach server.\n1. Check if backend is running\n2. Phone & PC must be on SAME WiFi\n3. Use PC IP, not localhost';
     } else if (error is http.ClientException) {
       return 'Network error: ${error.message}';
     } else if (error is FormatException) {

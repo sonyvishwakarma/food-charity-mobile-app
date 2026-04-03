@@ -37,16 +37,36 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   Future<void> _fetchStats() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
     try {
       final response = await _apiService.getAdminStats();
-      if (response['success'] == true && response['stats'] != null) {
-        setState(() {
-          _stats = Map<String, dynamic>.from(response['stats']);
-        });
+      if (mounted) {
+        if (response['success'] == true && response['stats'] != null) {
+          setState(() {
+            _stats = Map<String, dynamic>.from(response['stats']);
+          });
+        } else {
+          // Show error from server
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('⚠️ ${response['message'] ?? "Failed to load stats"}'),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     } catch (e) {
-      debugPrint('Error fetching admin stats: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('❌ Connection Error: Check your internet or backend status.'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

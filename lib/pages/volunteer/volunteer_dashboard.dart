@@ -97,15 +97,16 @@ class _VolunteerDashboardPageState extends State<VolunteerDashboardPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
-        toolbarHeight: 50,
+        toolbarHeight: 70,
         backgroundColor: primaryColor,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: Text('Volunteer: ${widget.user.name}', style: const TextStyle(fontSize: 16, color: Colors.white)),
+        title: Text('Volunteer: ${widget.user.name}', 
+          style: const TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             onPressed: _fetchTasks,
-            icon: const Icon(Icons.refresh, color: Colors.white, size: 20),
+            icon: const Icon(Icons.refresh, color: Colors.white, size: 28),
           ),
         ],
       ),
@@ -160,7 +161,7 @@ class _VolunteerDashboardPageState extends State<VolunteerDashboardPage> {
     return Text(
       title,
       style: const TextStyle(
-        fontSize: 13,
+        fontSize: 18,
         fontWeight: FontWeight.bold,
         color: Color(0xFF1E293B),
       ),
@@ -181,18 +182,21 @@ class _VolunteerDashboardPageState extends State<VolunteerDashboardPage> {
 
   Widget _buildCompactStat(String title, String value, Color color, IconData icon) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.1)),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.15)),
+        boxShadow: [
+          BoxShadow(color: color.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))
+        ],
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 14),
-          const SizedBox(height: 2),
-          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          Text(title, style: TextStyle(fontSize: 8, color: Colors.grey.shade500)),
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 6),
+          Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          Text(title, style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -225,27 +229,35 @@ class _VolunteerDashboardPageState extends State<VolunteerDashboardPage> {
 
   Widget _buildCompactTask(Map<String, dynamic> task, Color primaryColor) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade100),
       ),
       child: Row(
         children: [
-          Icon(Icons.location_on, color: primaryColor, size: 16),
-          const SizedBox(width: 8),
+          Icon(Icons.location_on, color: primaryColor, size: 22),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
-              task['pickupAddress'] ?? task['recipientAddress'] ?? 'Mission',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              task['pickupAddress'] ?? task['recipientAddress'] ?? 'Pending Mission',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(width: 8),
-          Text(
-            task['status']?.toUpperCase() ?? 'LIVE',
-            style: TextStyle(color: primaryColor, fontSize: 9, fontWeight: FontWeight.bold),
+          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              task['status']?.toUpperCase() ?? 'LIVE',
+              style: TextStyle(color: primaryColor, fontSize: 12, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -281,20 +293,23 @@ class _VolunteerDashboardPageState extends State<VolunteerDashboardPage> {
   Widget _buildActionItem(String title, IconData icon, Color color, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey.shade100),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5, offset: const Offset(0, 2))
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 16),
-            const SizedBox(height: 2),
-            Text(title, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
+            Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ],
         ),
       ),

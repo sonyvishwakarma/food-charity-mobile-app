@@ -11,8 +11,11 @@ class RequestController {
       foodType,
       category,
       quantityRequired,
-      servingsRequired,
-      description,
+      numberOfPeople,
+      preferredDate,
+      preferredTime,
+      specialRequirements,
+      contactNumber,
       isVeg,
       address,
       latitude,
@@ -32,12 +35,14 @@ class RequestController {
 
     await database.run(
       `INSERT INTO food_requests (
-        id, recipientId, foodType, category, quantityRequired, servingsRequired, 
-        description, isVeg, address, latitude, longitude, status, createdAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        id, recipientId, foodType, category, quantityRequired, numberOfPeople, 
+        preferredDate, preferredTime, specialRequirements, isVeg, address, 
+        contactNumber, latitude, longitude, status, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        id, recipientId, foodType, category || 'others', quantityRequired, servingsRequired, description, 
-        isVeg ? 1 : 0, address, latitude, longitude, 'pending', now
+        id, recipientId, foodType, category || 'others', quantityRequired || '', numberOfPeople || 1, 
+        preferredDate, preferredTime, specialRequirements,
+        isVeg === 'true' || isVeg === true ? 1 : 0, address, contactNumber, latitude, longitude, 'pending', now
       ]
     );
 
@@ -105,7 +110,7 @@ class RequestController {
 
     // Estimate meals based on servings requested for completed requests
     const servingsResult = await database.get(
-      `SELECT SUM(CAST(servingsRequired AS INTEGER)) as totalServings
+      `SELECT SUM(CAST(numberOfPeople AS INTEGER)) as totalServings
        FROM food_requests 
        WHERE recipientId = ? AND status = 'completed'`,
       [recipientId]

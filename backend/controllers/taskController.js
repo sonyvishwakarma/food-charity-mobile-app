@@ -98,7 +98,7 @@ class TaskController {
     const tasks = await database.all(
       `SELECT t.*, 
               COALESCE(d.foodType, r.foodType) as foodType,
-              COALESCE(d.quantity, r.servingsRequired || ' servings') as quantity,
+              COALESCE(d.quantity, r.numberOfPeople || ' servings') as quantity,
               COALESCE(d.pickupAddress, r.address, 'N/A') as location,
               COALESCE(d.pickupAddress, 'N/A') as pickupAddress,
               COALESCE(d.pickupDate, r.createdAt) as date,
@@ -200,7 +200,7 @@ class TaskController {
       `SELECT 
         SUM(CASE 
           WHEN t.donationId IS NOT NULL THEN CAST(d.quantity AS FLOAT)
-          WHEN t.requestId IS NOT NULL THEN CAST(fr.servingsRequired AS FLOAT) / 4.0
+          WHEN t.requestId IS NOT NULL THEN CAST(fr.numberOfPeople AS FLOAT) / 4.0
           ELSE 0 
         END) as totalQuantity
        FROM delivery_tasks t

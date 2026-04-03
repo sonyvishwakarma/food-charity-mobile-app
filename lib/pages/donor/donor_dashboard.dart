@@ -107,28 +107,28 @@ class _DonorDashboardPageState extends State<DonorDashboardPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        toolbarHeight: 50,
+        toolbarHeight: 70,
         backgroundColor: primaryColor,
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Row(
           children: [
             CircleAvatar(
-              radius: 14,
+              radius: 20,
               backgroundColor: Colors.white,
               child: Text(
                 widget.user.name[0].toUpperCase(),
-                style: TextStyle(color: primaryColor, fontSize: 12, fontWeight: FontWeight.bold),
+                style: TextStyle(color: primaryColor, fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(width: 10),
-            Text('Hi, ${widget.user.name}', style: const TextStyle(fontSize: 16, color: Colors.white)),
+            const SizedBox(width: 14),
+            Text('Hi, ${widget.user.name}', style: const TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
           IconButton(
             onPressed: _fetchStats,
-            icon: const Icon(Icons.refresh, color: Colors.white, size: 20),
+            icon: const Icon(Icons.refresh, color: Colors.white, size: 28),
           ),
         ],
       ),
@@ -180,7 +180,7 @@ class _DonorDashboardPageState extends State<DonorDashboardPage> {
     return Text(
       title,
       style: const TextStyle(
-        fontSize: 13,
+        fontSize: 18,
         fontWeight: FontWeight.bold,
         color: Color(0xFF1E293B),
       ),
@@ -206,19 +206,22 @@ class _DonorDashboardPageState extends State<DonorDashboardPage> {
 
   Widget _buildCompactStatCard(String title, String value, IconData icon, Color color) {
     return Container(
-      width: 85,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+      width: 105,
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.1)),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.15)),
+        boxShadow: [
+          BoxShadow(color: color.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))
+        ],
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 16),
-          const SizedBox(height: 4),
-          Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-          Text(title, style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(title, style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -247,20 +250,23 @@ class _DonorDashboardPageState extends State<DonorDashboardPage> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade100),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5, offset: const Offset(0, 2))
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 16),
-            const SizedBox(height: 2),
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
             Text(
               title, 
-              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -273,19 +279,19 @@ class _DonorDashboardPageState extends State<DonorDashboardPage> {
 
   Widget _buildCompactMotivation(Color primaryColor) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
+        color: primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
-          Icon(Icons.volunteer_activism, color: primaryColor, size: 24),
-          const SizedBox(width: 12),
+          Icon(Icons.volunteer_activism, color: primaryColor, size: 32),
+          const SizedBox(width: 16),
           const Expanded(
             child: Text(
-              'Shared food feeds people in need.',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              'Your shared food feeds the local community in need.',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, height: 1.4),
             ),
           ),
         ],

@@ -102,8 +102,14 @@ class _ChatPageState extends State<ChatPage> {
         // Save to local DB for persistence (Skip on Web)
         if (!kIsWeb && messages.isNotEmpty) {
           for (var msg in messages) {
-            final msgToSave = Map<String, dynamic>.from(msg);
-            msgToSave['chatId'] = widget.chatId;
+            final msgToSave = {
+              'id': (msg['id'] ?? msg['timestamp']).toString(),
+              'chatId': widget.chatId,
+              'senderId': (msg['senderId'] ?? msg['senderid']).toString(),
+              'senderName': (msg['senderName'] ?? msg['sendername'] ?? 'Unknown').toString(),
+              'text': (msg['text'] ?? '').toString(),
+              'timestamp': msg['timestamp'] ?? msg['time'] ?? 0,
+            };
             await _dbService.saveLocalMessage(msgToSave);
           }
         }
@@ -208,8 +214,9 @@ class _ChatPageState extends State<ChatPage> {
                         itemCount: _messages.length,
                         itemBuilder: (context, index) {
                           final message = _messages[index];
-                          final isMe =
-                              message['senderId'] == widget.currentUserId;
+                          // Normalize senderId regardless of casing
+                          final senderId = message['senderId'] ?? message['senderid'];
+                          final isMe = senderId.toString() == widget.currentUserId.toString();
 
                           return _buildMessageBubble(message, isMe);
                         },

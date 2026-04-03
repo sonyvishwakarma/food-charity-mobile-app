@@ -29,13 +29,13 @@ app.use(helmet({
 }));
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 
-// Rate Limiting
+// Rate Limiting - Increased for Chat Polling
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 2000, // Increased from 100 to 2000 to handle chat polling
   message: {
     success: false,
-    message: 'Too many requests from this IP, please try again after 15 minutes'
+    message: 'Too many requests, please try again later'
   }
 });
 app.use('/api/', limiter);
@@ -132,11 +132,14 @@ async function startServer() {
   try {
     await db.connect();
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📱 Phone access: http://192.168.0.106:${PORT}/api`);
-      console.log(`📝 Test API: http://localhost:${PORT}/`);
-      console.log(`👥 View Users: GET http://localhost:${PORT}/api/auth/users`);
-      console.log(`🗄️  Database: ${path.join(__dirname, 'db', 'annadanam.sqlite')}\n`);
+      console.log(`🚀 Annadanam Server Status:`);
+      console.log(`- Local: http://localhost:${PORT}`);
+      console.log(`- Web Test: http://localhost:${PORT}/`);
+      console.log(`- Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`- Database path: ${path.join(__dirname, 'db', 'annadanam.sqlite')}`);
+      console.log(`\n📱 TO TEST ON PHYSICAL PHONE:`);
+      console.log(`1. Your phone and PC MUST be on the SAME WiFi.`);
+      console.log(`2. Update .env file with your PC's actual WiFi IP.`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

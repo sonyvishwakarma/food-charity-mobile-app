@@ -194,16 +194,34 @@ class DatabaseService {
   // ========== CHAT LOCAL STORAGE METHODS ==========
   Future<void> saveLocalMessage(Map<String, dynamic> message) async {
     final db = await database;
+    
+    // Ensure chat exists first to satisfy foreign key (or ignore FK for local cache)
+    // We'll just insert a stub chat if it doesn't exist
+    final chatId = message['chatId']?.toString();
+    if (chatId == null) return;
+
+    final existingChat = await db.query('chats', where: 'id = ?', whereArgs: [chatId]);
+    if (existingChat.isEmpty) {
+      await db.insert('chats', {
+        'id': chatId,
+        'user1Id': 'unknown',
+        'user2Id': 'unknown',
+        'created_at': DateTime.now().toIso8601String(),
+        'lastMessage': message['text'],
+        'lastMessageTime': message['timestamp'],
+      });
+    }
+
     await db.insert(
       'messages',
       {
-        'id': message['id'] ?? message['timestamp'].toString(),
-        'chatId': message['chatId'],
-        'senderId': message['senderId'],
-        'senderName': message['senderName'],
-        'text': message['text'],
-        'timestamp': message['timestamp'],
-        'status': 'sent',
+        'id': (message['id'] ?? message['timestamp']).toString(),
+        'chatId': chatId,
+        'senderId': message['senderId']?.toString(),
+        'senderName': message['senderName']?.toString(),
+        'text': message['text']?.toString() ?? '',
+        'timestamp': message['timestamp'] is int ? message['timestamp'] : int.tryParse(message['timestamp']?.toString() ?? '0') ?? 0,
+        'status': message['status'] ?? 'sent',
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -224,14 +242,14 @@ class DatabaseService {
     await db.insert(
       'chats',
       {
-        'id': chat['id'],
-        'user1Id': chat['user1Id'],
-        'user2Id': chat['user2Id'],
-        'user1Name': chat['user1Name'],
-        'user2Name': chat['user2Name'],
-        'lastMessage': chat['lastMessage'],
-        'lastMessageTime': chat['lastMessageTime'],
-        'created_at': chat['createdAt'] ?? DateTime.now().toIso8601String(),
+        'id': chat['id']?.toString(),
+        'user1Id': chat['user1Id']?.toString(),
+        'user2Id': chat['user2Id']?.toString(),
+        'user1Name': chat['user1Name']?.toString(),
+        'user2Name': chat['user2Name']?.toString(),
+        'lastMessage': chat['lastMessage']?.toString(),
+        'lastMessageTime': chat['lastMessageTime'] is int ? chat['lastMessageTime'] : int.tryParse(chat['lastMessageTime']?.toString() ?? '0') ?? 0,
+        'created_at': chat['createdAt']?.toString() ?? DateTime.now().toIso8601String(),
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
