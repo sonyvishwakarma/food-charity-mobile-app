@@ -1,4 +1,3 @@
-module.exports = router;
 const express = require('express');
 const router = express.Router();
 const donationController = require('../controllers/donationController');
@@ -6,6 +5,8 @@ const auth = require('../middleware/auth');
 const authorize = require('../middleware/roleMiddleware');
 const { validate, schemas } = require('../middleware/validator');
 const upload = require('../middleware/upload');
+
+module.exports = router;
 
 // Only donors can create donations - adding image upload support
 router.post(
