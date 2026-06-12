@@ -23,6 +23,19 @@ router.get(
   donationController.getAvailableDonations.bind(donationController)
 );
 
+router.get('/debug/donations', async (req, res) => {
+  const db = require('../database/db');
+
+  const donations = await db.all(
+    'SELECT * FROM donations ORDER BY createdAt DESC'
+  );
+
+  res.json({
+    success: true,
+    count: donations.length,
+    donations
+  });
+});
 // Donors can see their own history, admins can see all
 router.get('/donor/:donorId', auth, authorize(['donor', 'admin']), donationController.getDonorDonations.bind(donationController));
 
