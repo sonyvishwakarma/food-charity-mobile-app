@@ -31,7 +31,7 @@ class DonationController {
         message: 'Donor ID and Food Type are required'
       });
     }
-
+console.log("📥 Donation Request Body:", req.body);
     // Get image URL if uploaded
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
@@ -39,7 +39,15 @@ class DonationController {
     const id = `don_${uuidv4().substring(0, 8)}`;
     const now = new Date().toISOString();
 
-    await database.run(
+// to check if data is stored properly or not on console itself
+console.log("💾 Inserting donation into SQLite:", {
+  id,
+  donorId,
+  foodType,
+  quantity
+});
+
+    const result = await database.run(
       `INSERT INTO donations (
         id, donorId, foodType, category, quantity, servings, description, isVeg, 
         imageUrl, pickupAddress, pickupDate, pickupTime, specialInstructions, 
@@ -56,6 +64,8 @@ class DonationController {
         'pending', now
       ]
     );
+    console.log("SQLIter Insert Result : ", result)
+
 
     const matches = await matchingService.findMatchesForDonation(id);
     console.log(`🔍 Found ${matches.length} matches for new donation ${id}`);

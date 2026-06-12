@@ -13,7 +13,7 @@ import '../models/user_model.dart';
 class ApiService {
   // Common fallback - use PC's WiFi IP when running on physical phone
   // static const String _defaultUrl = 'http://localhost:3000/api'; // only for emulator/web
-  static const String _defaultUrl = 'http://10.243.96.189:4000/api'; // current PC WiFi IP
+  static const String _defaultUrl = 'https://food-charity-mobile-app.onrender.com'; // current PC WiFi IP
 
   // Use API_URL from .env or fallback, with smart detection
   static String get baseUrl {

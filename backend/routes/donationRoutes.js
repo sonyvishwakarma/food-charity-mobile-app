@@ -16,6 +16,13 @@ router.post(
   donationController.createDonation.bind(donationController)
 );
 
+router.get(
+  '/',
+  auth,
+  authorize(['donor', 'volunteer', 'admin']),
+  donationController.getAvailableDonations.bind(donationController)
+);
+
 // Donors can see their own history, admins can see all
 router.get('/donor/:donorId', auth, authorize(['donor', 'admin']), donationController.getDonorDonations.bind(donationController));
 
