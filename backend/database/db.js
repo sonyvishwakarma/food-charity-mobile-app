@@ -1,47 +1,36 @@
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
-const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
 
 class Database {
   constructor() {
     this.db = null; // SQLite instance
-    this.pool = null; // PostgreSQL instance
-    this.isPostgres = false;
   }
 
   async connect() {
     try {
-      // 1. Check if we should use PostgreSQL (Render/Production)
-      if (process.env.DATABASE_URL) {
-        console.log('🌐 Connecting to PostgreSQL (Production Mode)...');
-        this.pool = new Pool({
-          connectionString: process.env.DATABASE_URL,
-          ssl: { rejectUnauthorized: false } // Required for Neon/Render
-        });
-        this.isPostgres = true;
-        
-        // Test connection
-        const client = await this.pool.connect();
-        console.log('✅ PostgreSQL connected successfully');
-        client.release();
-      } 
-      // 2. Fallback to SQLite (Local Development)
-      else {
-        console.log('📁 Connecting to Local SQLite (Development Mode)...');
-        const dbDir = path.join(__dirname, '..', 'db');
-        if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
+      console.log('📁 Connecting to SQLite Database...');
 
-        this.db = await open({
-          filename: path.join(dbDir, 'annadanam.sqlite'),
-          driver: sqlite3.Database
-        });
-        console.log('✅ SQLite connected successfully');
+      const dbDir = path.join(__dirname, '..', 'db');
+
+      if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
       }
 
+      this.db = await open({
+        filename: path.join(dbDir, 'annadanam.sqlite'),
+        driver: sqlite3.Database
+      });
+
+      this.isPostgres = false;
+
+      console.log('✅ SQLite connected successfully');
+
       await this.createTables();
+
       return this;
+
     } catch (error) {
       console.error('❌ Database connection error:', error);
       throw error;
@@ -49,46 +38,19 @@ class Database {
   }
 
   async run(query, params = []) {
-    if (this.isPostgres) {
-      // Map SQLite ? to Postgres $1, $2
-      let pgQuery = query;
-      params.forEach((_, i) => {
-        pgQuery = pgQuery.replace('?', `$${i + 1}`);
-      });
-      return await this.pool.query(pgQuery, params);
-    } else {
       return await this.db.run(query, params);
-    }
   }
 
   async get(query, params = []) {
-    if (this.isPostgres) {
-      let pgQuery = query;
-      params.forEach((_, i) => pgQuery = pgQuery.replace('?', `$${i + 1}`));
-      const result = await this.pool.query(pgQuery, params);
-      return result.rows[0];
-    } else {
       return await this.db.get(query, params);
-    }
   }
 
   async all(query, params = []) {
-    if (this.isPostgres) {
-      let pgQuery = query;
-      params.forEach((_, i) => pgQuery = pgQuery.replace('?', `$${i + 1}`));
-      const result = await this.pool.query(pgQuery, params);
-      return result.rows;
-    } else {
       return await this.db.all(query, params);
-    }
   }
 
   async exec(query) {
-    if (this.isPostgres) {
-      return await this.pool.query(query);
-    } else {
       return await this.db.exec(query);
-    }
   }
 
   async createTables() {
