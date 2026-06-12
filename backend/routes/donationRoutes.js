@@ -6,7 +6,77 @@ const authorize = require('../middleware/roleMiddleware');
 const { validate, schemas } = require('../middleware/validator');
 const upload = require('../middleware/upload');
 
-module.exports = router;
+// TEMP DEBUG ROUTES
+
+router.get('/debug/users', async (req, res) => {
+  const db = require('../database/db');
+
+  const users = await db.all(
+    'SELECT * FROM users'
+  );
+
+  res.json({
+    success: true,
+    users
+  });
+});
+
+
+router.get('/debug/donations', async (req, res) => {
+  const db = require('../database/db');
+
+  const donations = await db.all(
+    'SELECT * FROM donations'
+  );
+
+  res.json({
+    success: true,
+    donations
+  });
+});
+
+
+router.get('/debug/requests', async (req, res) => {
+  const db = require('../database/db');
+
+  const requests = await db.all(
+    'SELECT * FROM food_requests'
+  );
+
+  res.json({
+    success: true,
+    requests
+  });
+});
+
+
+router.get('/debug/chats', async (req, res) => {
+  const db = require('../database/db');
+
+  const chats = await db.all(
+    'SELECT * FROM chats'
+  );
+
+  res.json({
+    success: true,
+    chats
+  });
+});
+
+
+router.get('/debug/messages', async (req, res) => {
+  const db = require('../database/db');
+
+  const messages = await db.all(
+    'SELECT * FROM messages'
+  );
+
+  res.json({
+    success: true,
+    messages
+  });
+});
+
 
 // Only donors can create donations - adding image upload support
 router.post(
@@ -84,3 +154,6 @@ router.get('/debug/all-data', async (req, res) => {
     });
   }
 });
+
+
+module.exports = router;
