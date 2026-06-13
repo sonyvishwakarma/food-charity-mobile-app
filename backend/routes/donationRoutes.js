@@ -7,7 +7,7 @@ const { validate, schemas } = require('../middleware/validator');
 const upload = require('../middleware/upload');
 
 // TEMP DEBUG ROUTES
-
+//users
 router.get('/debug/users', async (req, res) => {
   const db = require('../database/db');
 
@@ -21,7 +21,7 @@ router.get('/debug/users', async (req, res) => {
   });
 });
 
-
+//donations
 router.get('/debug/donations', async (req, res) => {
   const db = require('../database/db');
 
@@ -35,7 +35,7 @@ router.get('/debug/donations', async (req, res) => {
   });
 });
 
-
+//food requests
 router.get('/debug/requests', async (req, res) => {
   const db = require('../database/db');
 
@@ -49,7 +49,7 @@ router.get('/debug/requests', async (req, res) => {
   });
 });
 
-
+//chats
 router.get('/debug/chats', async (req, res) => {
   const db = require('../database/db');
 
@@ -63,7 +63,7 @@ router.get('/debug/chats', async (req, res) => {
   });
 });
 
-
+//messages
 router.get('/debug/messages', async (req, res) => {
   const db = require('../database/db');
 
@@ -77,13 +77,34 @@ router.get('/debug/messages', async (req, res) => {
   });
 });
 
+// delivery tasks
+router.get('/debug/delivery_tasks', async (req, res) => {
+  const db = require('../database/db');
+
+  try {
+    const delivery_tasks = await db.all(
+      'SELECT * FROM delivery_tasks'
+    );
+
+    res.json({
+      success: true,
+      delivery_tasks
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 
 // Only donors can create donations - adding image upload support
 router.post(
   '/', 
   auth, 
   authorize('donor'), 
-  upload.single('image'), // Handle image upload
+  upload.single('image'), // to handle image upload
   validate(schemas.donation.create), 
   donationController.createDonation.bind(donationController)
 );
@@ -116,9 +137,6 @@ router.get('/stats/:donorId', auth, authorize(['donor', 'admin']), donationContr
 
 // Volunteers and admins can see available donations to pick them up
 router.get('/available', auth, authorize(['volunteer', 'admin']), donationController.getAvailableDonations.bind(donationController));
-
-module.exports = router;
-
 
 // for all api data
 // TEMP DEBUG API - Remove after testing

@@ -83,7 +83,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/food-requests', requestRoutes);
-app.use('/api/tasks', taskRoutes);
+app.use('/api/delivery_tasks', taskRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
 
