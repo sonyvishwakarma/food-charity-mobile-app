@@ -98,6 +98,27 @@ router.get('/debug/delivery_tasks', async (req, res) => {
   }
 });
 
+// food requests
+router.get('/debug/food_requests', async (req, res) => {
+  const db = require('../database/db');
+
+  try {
+    const delivery_tasks = await db.all(
+      'SELECT * FROM food_requests'
+    );
+
+    res.json({
+      success: true,
+      delivery_tasks
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 
 // Only donors can create donations - adding image upload support
 router.post(
